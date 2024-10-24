@@ -3,12 +3,14 @@ import { Separator } from '@/components/ui/separator.jsx'
 import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import useAuth from '@/hooks/useAuth'
+import { GoSignOut } from 'react-icons/go'
+import { Button } from '../ui/button'
 
 const Header = () => {
   const { user, isLoggedIn } = useAuth()
   return (
     <>
-      <header className='flex justify-between pt-4'>
+      <header className='flex justify-between'>
         <Link
           to='/'
           className='scroll-m-20 text-[25px] font-semibold tracking-tight'
@@ -26,11 +28,23 @@ const Header = () => {
             </Link>
           ))}
           {isLoggedIn && user ? (
-            <Avatar>
-              <AvatarImage src={user.image} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          ) : null}
+            <>
+              <Avatar>
+                <AvatarImage src={user.image} />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <Button variant='outline' size='icon' className='rounded-full'>
+                <GoSignOut />
+              </Button>
+            </>
+          ) : (
+            <Link
+              to='/login'
+              className='leading-7 font-medium text-[14px] cursor-pointer'
+            >
+              Login
+            </Link>
+          )}
         </div>
         {/*<div className="flex gap-6 items-center cursor-pointer">*/}
         {/*  {headerIcons.map((item, idx) => {*/}

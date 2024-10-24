@@ -93,7 +93,7 @@ const LoginForm = () => {
           ))}
           {/*Normal Inputs*/}
 
-          <Button type='submit'>Login</Button>
+          <Button type='submit'>Request Login Link</Button>
         </form>
       </Form>
       {error ? (
