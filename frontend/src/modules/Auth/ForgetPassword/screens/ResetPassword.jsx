@@ -13,18 +13,15 @@ import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
-import { loginFormSchema } from './schema/loginSchema'
 import useAuth from '@/hooks/useAuth'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { useCallback } from 'react'
+import { z } from 'zod'
+import { emailRegex } from '@/helpers/regex.js'
+import { jwtDecode } from 'jwt-decode'
+
 const fields = [
-  {
-    name: 'email',
-    placeholder: 'Enter Email',
-    type: 'text',
-  },
   {
     name: 'password',
     placeholder: 'Enter Password',
@@ -32,44 +29,62 @@ const fields = [
   },
 ]
 
-const LoginForm = () => {
+const ResetPassword = () => {
+  const token = useParams()
   const navigate = useNavigate()
   const { isLoggedIn, loading, user } = useAuth()
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [email, setEmail] = useState('')
 
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/')
     }
   }, [isLoggedIn])
+
+  useEffect(() => {
+    console.log('token', token)
+    const decodedToken = jwtDecode(token.id)
+    setEmail(decodedToken.email)
+  }, [])
+
+  const schema = z.object({
+    password: z.string().min(6, {
+      message: 'Password must be at least 6 characters',
+    }),
+  })
+
   const form = useForm({
-    resolver: zodResolver(loginFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
-      email: '',
       password: '',
     },
   })
 
   const onSubmit = async (values) => {
+    const password = values.password.trim()
     try {
-      const result = await axios.post('http://localhost:3000/api/auth/login', {
-        ...values,
-        type: 'login',
-      })
-      console.log('logged in', result)
+      const result = await axios.post(
+        'http://localhost:3000/api/auth/reset-password',
+        {
+          token: token.id,
+          newPassword: password,
+        }
+      )
+      console.log('password reset', result)
       if (result.data) {
-        toast.success('Verification Email Sent For Login')
+        toast.success('Password Reset Successfull')
+        setTimeout(() => {
+          navigate('/login')
+        }, 2000)
       }
       form.reset()
     } catch (error) {
-      console.error('Error While Login', error)
+      console.error('Error While Password Reset', error)
       setError(error.response.data)
     }
   }
-
-  const handlePasswordForget = useCallback(() => {
-    navigate('/forget-password')
-  }, [])
 
   return (
     <>
@@ -98,7 +113,7 @@ const LoginForm = () => {
           ))}
           {/*Normal Inputs*/}
 
-          <Button type='submit'>Request Login Link</Button>
+          <Button type='submit'>Request Password Reset Link</Button>
         </form>
       </Form>
       {error ? (
@@ -106,16 +121,11 @@ const LoginForm = () => {
           Error: {error}
         </p>
       ) : null}
-      <Button
-        variant='destructive'
-        type='submit'
-        className='mt-2'
-        onClick={handlePasswordForget}
-      >
-        Forget Password?
-      </Button>
+      {success ? (
+        <p className='text-[16px] font-medium text-teal-600 mt-4'>{success}</p>
+      ) : null}
     </>
   )
 }
 
-export default LoginForm
+export default ResetPassword

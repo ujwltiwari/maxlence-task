@@ -13,63 +13,68 @@ import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
-import { loginFormSchema } from './schema/loginSchema'
 import useAuth from '@/hooks/useAuth'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { useCallback } from 'react'
+import { z } from 'zod'
+import { emailRegex } from '@/helpers/regex.js'
+
 const fields = [
   {
     name: 'email',
     placeholder: 'Enter Email',
     type: 'text',
   },
-  {
-    name: 'password',
-    placeholder: 'Enter Password',
-    type: 'text',
-  },
 ]
 
-const LoginForm = () => {
+const ForgetPassword = () => {
   const navigate = useNavigate()
   const { isLoggedIn, loading, user } = useAuth()
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/')
     }
   }, [isLoggedIn])
+
+  const schema = z.object({
+    email: z
+      .string()
+      .email({
+        message: 'Please enter a valid email address',
+      })
+      .regex(emailRegex),
+  })
+
   const form = useForm({
-    resolver: zodResolver(loginFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       email: '',
-      password: '',
     },
   })
 
   const onSubmit = async (values) => {
     try {
-      const result = await axios.post('http://localhost:3000/api/auth/login', {
-        ...values,
-        type: 'login',
-      })
-      console.log('logged in', result)
+      const result = await axios.post(
+        'http://localhost:3000/api/auth/reset-password',
+        {
+          ...values,
+        }
+      )
+      console.log('password reset', result)
       if (result.data) {
-        toast.success('Verification Email Sent For Login')
+        toast.success('Password reset link sent to email')
+        setSuccess('Password reset link sent to email')
       }
       form.reset()
     } catch (error) {
-      console.error('Error While Login', error)
+      console.error('Error While Password Reset', error)
       setError(error.response.data)
     }
   }
-
-  const handlePasswordForget = useCallback(() => {
-    navigate('/forget-password')
-  }, [])
 
   return (
     <>
@@ -98,7 +103,7 @@ const LoginForm = () => {
           ))}
           {/*Normal Inputs*/}
 
-          <Button type='submit'>Request Login Link</Button>
+          <Button type='submit'>Request Password Reset Link</Button>
         </form>
       </Form>
       {error ? (
@@ -106,16 +111,11 @@ const LoginForm = () => {
           Error: {error}
         </p>
       ) : null}
-      <Button
-        variant='destructive'
-        type='submit'
-        className='mt-2'
-        onClick={handlePasswordForget}
-      >
-        Forget Password?
-      </Button>
+      {success ? (
+        <p className='text-[16px] font-medium text-teal-600 mt-4'>{success}</p>
+      ) : null}
     </>
   )
 }
 
-export default LoginForm
+export default ForgetPassword
