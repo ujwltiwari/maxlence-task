@@ -2,14 +2,14 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import RegistrationForm from "@/modules/Registration/forms/RegistrationForm.jsx";
+import RegistrationForm from '@/modules/Auth/Registration/forms/RegistrationForm.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <RegistrationForm />
+      <h1>Home Page</h1>
     </>
   )
 }

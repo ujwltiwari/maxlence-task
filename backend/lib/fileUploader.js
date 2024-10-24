@@ -16,6 +16,7 @@ const fileUploader = async (fileName, filePath, convert) => {
   });
 
   console.log("uploaded", uploaded);
+  return `${process.env.R2_PUBLIC_DOMAIN}hola/${fileName}`;
 };
 
 const getSignedURL = async (fileName) => {

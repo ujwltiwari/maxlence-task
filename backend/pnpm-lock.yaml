@@ -11,6 +11,9 @@ importers:
       '@auth/express':
         specifier: ^0.8.2
         version: 0.8.2(express@4.21.1)(nodemailer@6.9.15)
+      '@auth/sequelize-adapter':
+        specifier: ^2.7.2
+        version: 2.7.2(nodemailer@6.9.15)(sequelize@6.37.4(mysql2@3.11.3))
       '@aws-sdk/client-s3':
         specifier: ^3.678.0
         version: 3.678.0
@@ -93,6 +96,11 @@ packages:
     resolution: {integrity: sha512-ViKMaeSZHjcBfxG/k3HX6mLuJlte6p86oisfO5Pt+05DlSwKrxFAOB/vIQRkFxfflFN0cBKfMqx6Fgux03iEyg==}
     peerDependencies:
       express: ^4.18.2
+
+  '@auth/sequelize-adapter@2.7.2':
+    resolution: {integrity: sha512-+WyLcr/N5WzyFs9ICzAQ3W4K8d+Nu1Nnlg1jkJOqiu6ul4SJ+VQDvbIwRLfJzTriFSMAS8nWDRg0hS5EvLiE1Q==}
+    peerDependencies:
+      sequelize: ^6.6.5
 
   '@aws-crypto/crc32@5.2.0':
     resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
@@ -1639,6 +1647,15 @@ snapshots:
     dependencies:
       '@auth/core': 0.37.2(nodemailer@6.9.15)
       express: 4.21.1
+    transitivePeerDependencies:
+      - '@simplewebauthn/browser'
+      - '@simplewebauthn/server'
+      - nodemailer
+
+  '@auth/sequelize-adapter@2.7.2(nodemailer@6.9.15)(sequelize@6.37.4(mysql2@3.11.3))':
+    dependencies:
+      '@auth/core': 0.37.2(nodemailer@6.9.15)
+      sequelize: 6.37.4(mysql2@3.11.3)
     transitivePeerDependencies:
       - '@simplewebauthn/browser'
       - '@simplewebauthn/server'

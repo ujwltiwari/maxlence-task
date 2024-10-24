@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@auth/express": "^0.8.2",
+    "@auth/sequelize-adapter": "^2.7.2",
     "@aws-sdk/client-s3": "^3.678.0",
     "@aws-sdk/s3-request-presigner": "^3.678.0",
     "@sequelize/core": "7.0.0-alpha.42",
