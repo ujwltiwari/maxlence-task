@@ -1,8 +1,8 @@
-import mongoose, {Schema} from "mongoose";
-import * as argon2 from "argon2";
-import jwt from "jsonwebtoken";
-import dotenv from 'dotenv';
-dotenv.config();
+const argon2 = require("argon2");
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const userSchema = new Schema(
   {
@@ -24,33 +24,33 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: [6, 'Password must be at least 6 characters long'],
+      minlength: [6, "Password must be at least 6 characters long"],
     },
     role: {
       type: String,
-      default: 'user',
+      default: "user",
     },
   },
   {
     timestamps: true,
-  }
-)
+  },
+);
 
 // password hashing middleware
-userSchema.pre('save', async function (next) {
-  console.log('password hasing schema called')
-  if (!this.isModified('password')) {
-    return next
+userSchema.pre("save", async function (next) {
+  console.log("password hasing schema called");
+  if (!this.isModified("password")) {
+    return next;
   }
-  this.password = await argon2.hash(this.password)
-  next()
-})
+  this.password = await argon2.hash(this.password);
+  next();
+});
 
 // Method to compare password for authentication
 userSchema.methods.comparePassword = function (candidatePassword) {
-  console.log('userSchema called', this, candidatePassword)
-  return argon2.verify(this.password, candidatePassword)
-}
+  console.log("userSchema called", this, candidatePassword);
+  return argon2.verify(this.password, candidatePassword);
+};
 // Generate jwt token
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(
@@ -60,11 +60,10 @@ userSchema.methods.generateAuthToken = function () {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '1h',
-    }
-  )
-}
+      expiresIn: "1h",
+    },
+  );
+};
 
-const User = mongoose.model('User', userSchema)
-// module.exports = User
-export default User
+const User = mongoose.model("User", userSchema);
+module.exports = User;

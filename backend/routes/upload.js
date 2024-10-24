@@ -1,7 +1,6 @@
-import express from "express";
-import multer from "multer";
-import fileUploader from "../lib/fileUploader.js";
-
+const express = require("express");
+const multer = require("multer");
+const fileUploader = require("../lib/fileUploader");
 const router = express.Router();
 
 const upload = multer({ dest: "uploads/" }); // Files are temporarily saved in 'uploads/'
@@ -22,4 +21,4 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

@@ -1,39 +1,28 @@
-import express from "express";
-import User from "../../models/userModel.js";
-
+const express = require("express");
 const router = express.Router();
-
+const { User } = require("../../models");
 router.get("/", async (req, res) => {
   res.send("login route");
 });
 
 // Create an User
 router.post("/", async (req, res) => {
-  const { firstName, lastName, email, password, role } = req.body;
-
-  try {
-    const existingUser = await User.findOne({
-      email,
-    });
-
-    if (existingUser) {
-      return res.status(400).json("User already exists");
-    }
-
-    const userObj = new User({
-      firstName,
-      lastName,
-      email,
-      password,
-      role,
-    });
-
-    const result = await userObj.save();
-    return res.status(200).json(result);
-  } catch (err) {
-    console.log("errorIs", err);
-    return res.status(400).json(err.message);
+  const { fullName, email, password, role, image } = req.body;
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    return res.status(400).json("User already exists");
   }
+  const result = await User.create({
+    fullName,
+    email,
+    password,
+    role,
+    image,
+  }).catch((error) => {
+    console.log("error", error);
+  });
+  console.log("result", result);
+  return res.status(201).json({ result });
 });
 
-export default router;
+module.exports = router;
