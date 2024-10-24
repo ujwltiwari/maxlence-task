@@ -88,32 +88,24 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     console.log("user", user);
-    if (!user || !user.isVerified) {
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials or email not verified." });
+    if (!user) {
+      return res.status(401).json("Account Doesn't Exists");
     }
 
     const isMatch = await argon2.verify(user.password, password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials." });
+      return res.status(401).json("Invalid credentials.");
+    }
+
+    if (!user.isVerified) {
+      await loginVerificationCreator(user, email);
+      return res
+        .status(401)
+        .json("Email not verified, We have sent you a verification e-mail");
     }
 
     // generate token for login verification
-    const verificationToken = jwt.sign(
-      { userId: user.id, type: "login" },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "15m",
-      },
-    );
-
-    const verificationUrl = `http://localhost:3000/api/auth/verify/${verificationToken}`;
-    await transporter.sendMail({
-      to: email,
-      subject: "Login Verification Link",
-      html: `<p>Please verify your login by clicking the link: <a href="${verificationUrl}">Verify Login</a></p>`,
-    });
+    await loginVerificationCreator(user, email);
 
     res.status(201).json({
       message: "Verification Email sent for Login",
@@ -124,7 +116,6 @@ exports.login = async (req, res) => {
 };
 
 exports.verifyToken = (req, res) => {
-  console.log("verifyToken called", req.headers.authorization?.split(" ")[1]);
   // Extract token from Authorization header
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -146,6 +137,7 @@ exports.verifyToken = (req, res) => {
     const userPayload = {
       userId: decoded.userId, // Ensure that the correct key is used based on how the token was created
       email: decoded.email,
+      image: decoded.image,
     };
 
     // Respond with user information
@@ -155,9 +147,27 @@ exports.verifyToken = (req, res) => {
   }
 };
 
+const loginVerificationCreator = async (user, email) => {
+  // generate token for login verification
+  const verificationToken = jwt.sign(
+    { userId: user.id, type: user.isVerified ? "login" : "signup" },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "15m",
+    },
+  );
+
+  const verificationUrl = `http://localhost:3000/api/auth/verify/${verificationToken}`;
+  await transporter.sendMail({
+    to: email,
+    subject: "Login Verification Link",
+    html: `<p>Please verify your login by clicking the link: <a href="${verificationUrl}">Verify Login</a></p>`,
+  });
+};
+
 const setCookieAndToken = (user, res) => {
   const accessToken = jwt.sign(
-    { userId: user, email: user.email },
+    { userId: user, email: user.email, image: user.image },
     process.env.JWT_SECRET,
     {
       expiresIn: "1d",

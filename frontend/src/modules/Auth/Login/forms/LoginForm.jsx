@@ -17,7 +17,7 @@ import { loginFormSchema } from './schema/loginSchema'
 import useAuth from '@/hooks/useAuth'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import { useState } from 'react'
 const fields = [
   {
     name: 'email',
@@ -34,6 +34,7 @@ const fields = [
 const LoginForm = () => {
   const navigate = useNavigate()
   const { isLoggedIn, loading, user } = useAuth()
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -49,16 +50,19 @@ const LoginForm = () => {
   })
 
   const onSubmit = async (values) => {
-    e.preventDefault()
-    console.log(values)
-    // const { fullName, lastName, email, password, image } = values
-    const result = await axios.post('http://localhost:3000/api/auth/login', {
-      ...values,
-      type: 'login',
-    })
-    console.log('logged in', result)
-    if (result.data) {
-      toast.success('Verification Email Sent For Login')
+    try {
+      const result = await axios.post('http://localhost:3000/api/auth/login', {
+        ...values,
+        type: 'login',
+      })
+      console.log('logged in', result)
+      if (result.data) {
+        toast.success('Verification Email Sent For Login')
+      }
+      form.reset()
+    } catch (error) {
+      console.error('Error While Login', error)
+      setError(error.response.data)
     }
   }
 
@@ -92,6 +96,11 @@ const LoginForm = () => {
           <Button type='submit'>Login</Button>
         </form>
       </Form>
+      {error ? (
+        <p className='text-[16px] font-medium text-red-600 mt-4'>
+          Error: {error}
+        </p>
+      ) : null}
     </>
   )
 }
