@@ -1,8 +1,8 @@
-const argon2 = require('argon2')
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const jwt = require('jsonwebtoken')
-require('dotenv').config()
+import mongoose, {Schema} from "mongoose";
+import * as argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const userSchema = new Schema(
   {
@@ -66,4 +66,5 @@ userSchema.methods.generateAuthToken = function () {
 }
 
 const User = mongoose.model('User', userSchema)
-module.exports = User
+// module.exports = User
+export default User

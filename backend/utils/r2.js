@@ -1,4 +1,4 @@
-const {S3Client} = require("@aws-sdk/client-s3")
+import { S3Client } from "@aws-sdk/client-s3";
 
 const r2 = new S3Client({
   region: "auto",
@@ -6,7 +6,7 @@ const r2 = new S3Client({
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY,
     secretAccessKey: process.env.R2_SECRET_KEY,
-},
+  },
 });
 
-module.exports = r2
+export default r2;

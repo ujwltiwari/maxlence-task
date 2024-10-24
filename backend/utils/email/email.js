@@ -1,4 +1,6 @@
-const nodemailer = require('nodemailer')
+// const nodemailer = require('nodemailer')
+
+import nodemailer from "nodemailer";
 
 const sendEmail = async () => {
   console.log('sendEmail')
@@ -32,4 +34,5 @@ async function main(email) {
 
 main().catch(console.error)
 
-module.exports = sendEmail
+// module.exports = sendEmail
+export default sendEmail

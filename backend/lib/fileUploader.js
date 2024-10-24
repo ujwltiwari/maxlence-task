@@ -1,7 +1,7 @@
-const fs = require('fs')
-const {getSignedUrl} = require("@aws-sdk/s3-request-presigner")
-const {PutObjectCommand} = require("@aws-sdk/client-s3");
-const r2 = require("../utils/r2")
+import fs from "fs"
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import {PutObjectCommand} from "@aws-sdk/client-s3";
+import r2 from "../utils/r2.js";
 const fileUploader = async (
     fileName,
     filePath,
@@ -43,4 +43,4 @@ const getSignedURL = async (fileName) => {
   }
 }
 
-module.exports = fileUploader
+export default fileUploader

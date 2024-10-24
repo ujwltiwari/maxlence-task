@@ -1,6 +1,7 @@
-const express = require('express')
-const User = require('../../models/userModel')
-const sendEmail = require('../../utils/email/email')
+import express from "express"
+import User from "../../models/userModel.js";
+import sendEmail from "../../utils/email/email.js";
+
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -29,4 +30,5 @@ router.post('/', async (req, res) => {
   res.json({ token })
 })
 
-module.exports = router
+// module.exports = router
+export default router
