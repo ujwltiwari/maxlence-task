@@ -85,35 +85,42 @@ const verifyEmail = async (req, res) => {
 
 // Login User
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, type } = req.body;
+  console.log("login data", email, type);
+  const user = await User.findOne({ where: { email } });
+  if (type === "email") {
+    try {
+      console.log("user", user);
+      if (!user) {
+        return res.status(401).json("Account Doesn't Exists");
+      }
 
-  try {
-    const user = await User.findOne({ where: { email } });
-    console.log("user", user);
-    if (!user) {
-      return res.status(401).json("Account Doesn't Exists");
-    }
+      const isMatch = await argon2.verify(user.password, password);
+      if (!isMatch) {
+        return res.status(401).json("Invalid credentials.");
+      }
 
-    const isMatch = await argon2.verify(user.password, password);
-    if (!isMatch) {
-      return res.status(401).json("Invalid credentials.");
-    }
+      if (!user.isVerified) {
+        await loginVerificationCreator(user, email);
+        return res
+          .status(401)
+          .json("Email not verified, We have sent you a verification e-mail");
+      }
 
-    if (!user.isVerified) {
+      // generate token for login verification
       await loginVerificationCreator(user, email);
-      return res
-        .status(401)
-        .json("Email not verified, We have sent you a verification e-mail");
+
+      res.status(201).json({
+        message: "Verification Email sent for Login",
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-
-    // generate token for login verification
-    await loginVerificationCreator(user, email);
-
+  } else if (type === "google") {
+    setCookieAndToken(user, res);
     res.status(201).json({
-      message: "Verification Email sent for Login",
+      message: "Login Successful",
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 };
 
@@ -195,6 +202,7 @@ const loginVerificationCreator = async (user, email) => {
 };
 
 const setCookieAndToken = (user, res) => {
+  console.log("setCookieToken", user.id);
   const accessToken = jwt.sign(
     {
       userId: user.id,

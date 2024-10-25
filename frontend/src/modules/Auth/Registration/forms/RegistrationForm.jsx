@@ -116,7 +116,6 @@ const RegistrationForm = () => {
 
   return (
     <>
-      <Toaster position='top-right' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
           {/*Normal Inputs*/}

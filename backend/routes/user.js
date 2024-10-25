@@ -79,6 +79,29 @@ router.get("/role", async (req, res) => {
   }
 });
 
+// Filter users by email
+router.get("/email", async (req, res) => {
+  const { email, page = 1, pageSize = 10 } = req.query;
+
+  try {
+    const result = await paginate(
+      User,
+      {
+        where: { email },
+      },
+      page,
+      pageSize,
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error filtering users by role:", error);
+    return res
+      .status(500)
+      .json({ message: "Error while filtering users", error });
+  }
+});
+
 // Filter users by id
 router.get("/:id", async (req, res) => {
   const { id } = req.params;

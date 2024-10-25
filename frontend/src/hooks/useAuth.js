@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 import { useEffect, useState } from 'react'
 import axios from 'axios' // Make sure axios is imported
+import { googleLogout } from '@react-oauth/google'
 
 const useAuth = () => {
   const [user, setUser] = useState(null)
@@ -54,7 +55,7 @@ const useAuth = () => {
         .catch((error) => {
           console.error('Logout error:', error)
         })
-
+      googleLogout()
       // Update auth states
       setIsLoggedIn(false)
       setUser(null)

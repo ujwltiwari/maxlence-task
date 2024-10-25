@@ -7,14 +7,6 @@ export const headerItems = [
     link: "/",
   },
   {
-    title: "Shop",
-    link: "/shop",
-  },
-  {
-    title: "Product",
-    link: "/",
-  },
-  {
     title: "Contact Us",
     link: "/",
   },

@@ -13,6 +13,7 @@ import Profile from './modules/Profile/screens/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
 import AllUsers from './modules/Profile/screens/AllUsers'
 import EditProfile from './modules/Profile/screens/EditProfile'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -80,8 +81,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router}>
-      <Toaster />
-    </RouterProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <RouterProvider router={router}>
+        <Toaster />
+      </RouterProvider>
+    </GoogleOAuthProvider>
   </StrictMode>
 )

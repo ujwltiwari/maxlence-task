@@ -51,10 +51,11 @@ const LoginForm = () => {
   })
 
   const onSubmit = async (values) => {
+    console.log('onSubmit called')
     try {
       const result = await axios.post('http://localhost:3000/api/auth/login', {
         ...values,
-        type: 'login',
+        type: 'email',
       })
       console.log('logged in', result)
       if (result.data) {
