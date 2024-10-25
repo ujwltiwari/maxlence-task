@@ -17,20 +17,25 @@ A comprehensive user management system built using **React**, **Next.js**, and *
 ### Frontend
 
 - **User Registration**
+
   - Users can register with their full name, email, and password.
   - Image upload feature allows users to upload a profile picture during registration.
   - The application sends a verification link to the user's email upon successful registration.
 
 - **User Login**
+
   - Users can log in via an email verification link instead of traditional password authentication.
+  - **Google Login** option allows users to log in with their Google account for a seamless experience.
   - The application generates JWT tokens with refresh tokens upon successful login.
 
 - **Profile Management**
+
   - Users can view and edit their profiles, including updating their name, email, and password.
   - Users can upload a new profile picture and preview it before saving.
   - The application keeps the existing password unchanged unless a new one is provided.
 
 - **Error Handling**
+
   - User-friendly error messages are displayed for registration and login issues.
   - Validation is enforced using Zod schemas, ensuring proper data input.
 
@@ -40,23 +45,29 @@ A comprehensive user management system built using **React**, **Next.js**, and *
 ### Backend
 
 - **RESTful API**
+
   - Built using Node.js and Express, providing a set of RESTful endpoints for user management.
 
 - **User Management**
+
   - CRUD operations for user accounts, including creating, reading, updating, and deleting users.
 
 - **Database Integration**
+
   - Utilizes MySQL with Sequelize ORM for database interactions.
   - User information is stored securely in the database.
 
 - **Authentication**
+
   - JWT-based authentication for secure access to protected routes.
   - Passwords are hashed for security.
 
 - **Email Verification**
+
   - Sends verification emails to users during registration, ensuring valid user accounts.
 
 - **Image Upload**
+
   - Supports image uploads via an S3 bucket, enabling users to upload profile pictures.
 
 - **Caching with Redis**
@@ -65,6 +76,7 @@ A comprehensive user management system built using **React**, **Next.js**, and *
 ## Technologies
 
 - **Frontend:**
+
   - React
   - Next.js
   - Axios for API calls
@@ -85,11 +97,13 @@ A comprehensive user management system built using **React**, **Next.js**, and *
 ### Frontend
 
 1. Clone the repository
- ```bash
-   git clone <repository-url>
+
+```bash
+  git clone <repository-url>
 ```
 
 - Backend
+
 ```bash
    cd frontend
    pnpm i
@@ -97,8 +111,8 @@ A comprehensive user management system built using **React**, **Next.js**, and *
 ```
 
 - Frontend
-   ```bash
-   cd frontend
-   pnpm i
-   pnpm run dev
-```
+  ```bash
+  cd frontend
+  pnpm i
+  pnpm run dev
+  ```
