@@ -63,6 +63,7 @@ const verifyEmail = async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // decode userId from jwt
     const user = await User.findByPk(decoded.userId); // verify user using decoded userId
+    console.log("user", user);
     console.log("verify user", decoded);
     if (user && decoded.type === "signup") {
       user.isVerified = true;
@@ -140,6 +141,7 @@ const verifyToken = (req, res) => {
       email: decoded.email,
       image: decoded.image,
       name: decoded.name,
+      role: decoded.role,
     };
 
     // Respond with user information

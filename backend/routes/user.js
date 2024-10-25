@@ -5,13 +5,19 @@ const router = express.Router();
 const { Op } = require("sequelize");
 const argon2 = require("argon2");
 const { setCookieAndToken } = require("../controllers/authController");
+const { fetchCache } = require("../redis/cache");
 
 // Fetch all users with pagination
 router.get("/", async (req, res) => {
   const { page = 1, pageSize = 10 } = req.query;
 
   try {
-    const result = await paginate(User, {}, page, pageSize);
+    // const result = await paginate(User, {}, page, pageSize);
+    const result = await fetchCache(
+      "users",
+      () => paginate(User, {}, page, pageSize),
+      3600,
+    );
     res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -26,17 +32,19 @@ router.get("/search", async (req, res) => {
   const { name, page = 1, pageSize = 10 } = req.query;
 
   try {
-    const result = await paginate(
-      User,
-      {
-        where: {
-          fullName: {
-            [Op.startsWith]: `%${name}%`,
+    const result = await fetchCache(name, () =>
+      paginate(
+        User,
+        {
+          where: {
+            fullName: {
+              [Op.startsWith]: `%${name}%`,
+            },
           },
         },
-      },
-      page,
-      pageSize,
+        page,
+        pageSize,
+      ),
     );
 
     res.status(200).json(result);
@@ -121,6 +129,17 @@ router.put("/:id", async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error while updating user profile", error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  console.log("delete called", req.params.id);
+  const userId = req.params.id;
+  try {
+    await User.destroy({ where: { id: userId } });
+    res.status(200).json({ message: "User deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete user." });
   }
 });
 
