@@ -110,9 +110,9 @@ const EditProfile = () => {
       )
       if (result.data) {
         toast.success('Profile updated successfully')
-        // setTimeout(() => {
-        //   window.location.reload()
-        // }, 1500)
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
       }
       form.reset() // Reset react-hook-form fields
       setImagePreview(null) // Set image preview to null

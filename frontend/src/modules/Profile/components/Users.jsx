@@ -6,7 +6,11 @@ import { Trash } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useCallback } from 'react'
 import Spinner from '@/components/Spinner'
+import useAuth from '@/hooks/useAuth'
+import { toast } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
 const Users = () => {
+  const { user } = useAuth()
   const [users, setUsers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -54,8 +58,20 @@ const Users = () => {
     setLoading(false)
   }, [])
 
+  const handleUserDelete = async (id) => {
+    console.log('handleUserDelete', id)
+    try {
+      const result = await axios.delete(`http://localhost:3000/users/${id}`)
+      console.log('result', result)
+      toast.success('User Deleted')
+    } catch (err) {
+      console.error('Error Deleting Users', err)
+    }
+  }
+
   return (
     <div className='flex flex-col items-center'>
+      <Toaster />
       <div className='w-full max-w-md'>
         <Input
           placeholder='Enter Name to Search...'
@@ -64,19 +80,28 @@ const Users = () => {
         />
         {!loading && users.length ? (
           <ul>
-            {users.map((user) => (
+            {users.map((x) => (
               <li
-                key={user.id}
+                key={x.id}
                 className='flex items-center justify-between p-4 border rounded mb-2'
               >
                 <img
-                  src={user.image}
+                  src={x.image}
                   className='w-[50px] h-[50px] cursor-pointer'
                 />
                 <div>
-                  <p className='font-bold'>{user.fullName}</p>
-                  <p>{user.email}</p>
+                  <p className='font-bold'>{x.fullName}</p>
+                  <p>{x.email}</p>
                 </div>
+                {user.role === 'admin' ? (
+                  <Button
+                    size='icon'
+                    variant='destructive'
+                    onClick={() => handleUserDelete(x.id)}
+                  >
+                    <Trash />
+                  </Button>
+                ) : null}
               </li>
             ))}
           </ul>

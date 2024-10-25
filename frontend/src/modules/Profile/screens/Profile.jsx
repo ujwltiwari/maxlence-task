@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Cog } from 'lucide-react'
 import { List } from 'lucide-react'
 import { useCallback } from 'react'
-
+import { Badge } from '@/components/ui/badge'
 const Profile = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -22,7 +22,10 @@ const Profile = () => {
 
   return (
     <>
-      <h1 className='text-[24px] font-medium'>Welcome {user?.name}</h1>
+      <div className='flex gap-2 items-center justify-center'>
+        <h1 className='text-[24px] font-medium'>Welcome {user?.name}</h1>
+        <Badge className='capitalize'>{user?.role}</Badge>
+      </div>
       <div className='flex flex-col gap-2 mt-4 max-w-[500px] m-auto'>
         <Button
           variant='outline'

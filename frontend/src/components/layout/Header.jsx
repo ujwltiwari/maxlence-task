@@ -33,10 +33,12 @@ const Header = () => {
           ))}
           {isLoggedIn && user ? (
             <>
-              <Avatar>
-                <AvatarImage src={user.image} />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <Link to='/profile'>
+                <Avatar>
+                  <AvatarImage src={user.image} />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </Link>
               <Button
                 variant='outline'
                 size='icon'
