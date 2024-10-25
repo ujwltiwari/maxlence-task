@@ -1,5 +1,4 @@
 const express = require("express");
-const connectDB = require("./lib/db");
 const cors = require("cors");
 const PORT = 3000;
 const app = express();
@@ -7,7 +6,6 @@ const db = require("./models");
 const authRoutes = require("./routes/(auth)/authRoutes");
 const uploadRoute = require("./routes/upload");
 const userRoute = require("./routes/user");
-connectDB();
 // Middleware to parse JSON
 app.use(express.json());
 app.use(
