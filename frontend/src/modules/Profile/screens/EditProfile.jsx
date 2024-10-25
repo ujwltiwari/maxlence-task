@@ -6,18 +6,18 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { registrationFormSchema } from '@/modules/Auth/Registration/forms/schema/registrationSchema.js'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { useNavigate } from 'react-router-dom'
 import useAuth from '@/hooks/useAuth'
-import { useEffect } from 'react'
+import { z } from 'zod'
+import { emailRegex } from '@/helpers/regex'
 
 const fields = [
   {
@@ -28,67 +28,108 @@ const fields = [
   {
     name: 'email',
     placeholder: 'Enter Email',
-    type: 'text',
+    type: 'email',
   },
   {
     name: 'password',
-    placeholder: 'Enter Password',
-    type: 'text',
+    placeholder: 'Enter Password (leave blank to keep current password)',
+    type: 'password',
   },
 ]
 
-const RegistrationForm = () => {
+const EditProfile = () => {
   const navigate = useNavigate()
   const { isLoggedIn, loading, user } = useAuth()
   const [imageUrl, setImageUrl] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
   const [error, setError] = useState('')
+  const [userDetails, setUserDetails] = useState(null)
 
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/')
+    if (user) {
+      getDetails()
     }
-  }, [isLoggedIn])
+  }, [user])
+
+  // Get current user's details
+  const getDetails = async () => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:3000/users/${user.userId}`
+      )
+      console.log('data', data)
+      setUserDetails(data)
+      form.reset({
+        fullName: data.fullName,
+        email: data.email,
+        password: '', // Keep password empty for security
+        image: null,
+      })
+      setImagePreview(data.image)
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+      setError('Failed to fetch user details.')
+    }
+  }
+
+  const schema = z.object({
+    fullName: z
+      .string()
+      .min(2, {
+        message: 'Username must be at least 2 characters.',
+      })
+      .max(50),
+    email: z
+      .string()
+      .email({
+        message: 'Please enter a valid email address',
+      })
+      .regex(emailRegex),
+    password: z.string().optional(), // Make the password field optional
+  })
 
   const form = useForm({
-    resolver: zodResolver(registrationFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       fullName: '',
       email: '',
-      password: '',
+      password: undefined, // Keep as empty string initially
       image: null,
     },
   })
 
   const onSubmit = async (values) => {
-    console.log(values)
+    console.log('values', { ...values, image: imageUrl })
     try {
-      const result = await axios.post(
-        'http://localhost:3000/api/auth/register',
+      const result = await axios.put(
+        `http://localhost:3000/users/${user.userId}`, // Update the endpoint to PUT request
         {
           ...values,
           image: imageUrl,
-          type: 'signup',
         }
       )
-      console.log('signed up', result)
       if (result.data) {
-        toast.success('Account Created, Verification link sent to email')
+        toast.success('Profile updated successfully')
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 1500)
       }
-      form.reset() // reset react-hook-form fields
-      setImagePreview(null) // also setImagePreview to null
-      setIsSubmitDisabled(true)
+      form.reset() // Reset react-hook-form fields
+      setImagePreview(null) // Set image preview to null
     } catch (error) {
       console.error('Error Occurred', error.response)
-      setError(error.response.data)
+      setError(
+        error.response.data.message || 'An error occurred during the update.'
+      )
     }
   }
+
+  console.log('imageUrl', imageUrl)
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0]
     if (file) {
-      //show image preview
+      // Show image preview
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result) // Set the preview URL
@@ -96,7 +137,7 @@ const RegistrationForm = () => {
       reader.readAsDataURL(file) // Convert file to a data URL
       form.setValue('image', file) // Set the file in the form values
 
-      // upload file to s3
+      // Upload file to S3
       const data = new FormData()
       data.append('file', file) // Append the selected file to FormData
 
@@ -107,7 +148,6 @@ const RegistrationForm = () => {
           },
         })
         setImageUrl(result?.data?.result)
-        setIsSubmitDisabled(false)
       } catch (error) {
         console.error('Error Uploading Image', error)
       }
@@ -119,7 +159,7 @@ const RegistrationForm = () => {
       <Toaster position='top-right' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
-          {/*Normal Inputs*/}
+          {/* Normal Inputs */}
           {fields.map((x, idx) => (
             <FormField
               key={idx}
@@ -139,8 +179,7 @@ const RegistrationForm = () => {
               )}
             />
           ))}
-          {/*Normal Inputs*/}
-          {/*Image Input*/}
+          {/* Image Input */}
           <FormField
             control={form.control}
             name='image'
@@ -157,7 +196,7 @@ const RegistrationForm = () => {
               </FormItem>
             )}
           />
-          {/*Image Input*/}
+          {/* Image Preview */}
           {imagePreview && (
             <div className='mt-2'>
               <img
@@ -167,19 +206,16 @@ const RegistrationForm = () => {
               />
             </div>
           )}
-          <p>Please Upload Image to Complete Sign Up</p>
-          <Button type='submit' disabled={isSubmitDisabled}>
-            Submit
-          </Button>
+          <Button type='submit'>Submit</Button>
         </form>
       </Form>
-      {error ? (
+      {error && (
         <p className='text-[16px] font-medium text-red-600 mt-4'>
           Error: {error}
         </p>
-      ) : null}
+      )}
     </>
   )
 }
 
-export default RegistrationForm
+export default EditProfile

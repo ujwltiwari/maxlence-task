@@ -2,6 +2,7 @@ const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { User } = require("../models");
+const encoded = require("express/lib/view");
 
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -13,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Register User
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const { fullName, email, password, role, image } = req.body;
     const existingUser = await User.findOne({ where: { email } });
@@ -56,7 +57,7 @@ exports.register = async (req, res) => {
 };
 
 // Verify Email
-exports.verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res) => {
   const { token, type } = req.params;
 
   try {
@@ -82,7 +83,7 @@ exports.verifyEmail = async (req, res) => {
 };
 
 // Login User
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -115,7 +116,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.verifyToken = (req, res) => {
+const verifyToken = (req, res) => {
   // Extract token from Authorization header
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -133,17 +134,43 @@ exports.verifyToken = (req, res) => {
       return res.status(401).json({ message: "Invalid token." });
     }
 
-    // Prepare user payload with userId and email
+    // user payload with userId, email, imageURL & name
     const userPayload = {
-      userId: decoded.userId, // Ensure that the correct key is used based on how the token was created
+      userId: decoded.userId,
       email: decoded.email,
       image: decoded.image,
+      name: decoded.name,
     };
 
     // Respond with user information
     res.status(200).json(userPayload);
   } catch (error) {
     res.status(403).json({ message: "Invalid token." });
+  }
+};
+
+const logout = (req, res) => {
+  console.log("logout called");
+  try {
+    res.clearCookie("token", {
+      path: "/",
+      sameSite: "strict",
+      secure: true,
+      maxAge: 0, // Expire immediately
+    });
+    res.clearCookie("refreshToken", {
+      path: "/",
+      sameSite: "strict",
+      secure: true,
+      httpOnly: true,
+      maxAge: 0, // Expire immediately
+    });
+    return res.status(200).json({ message: "Successfully logged out" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res
+      .status(500)
+      .json({ message: "Logout failed. Please try again." });
   }
 };
 
@@ -167,7 +194,13 @@ const loginVerificationCreator = async (user, email) => {
 
 const setCookieAndToken = (user, res) => {
   const accessToken = jwt.sign(
-    { userId: user, email: user.email, image: user.image },
+    {
+      userId: user.id,
+      email: user.email,
+      image: user.image,
+      role: user.role,
+      name: user.fullName,
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: "1d",
@@ -195,4 +228,14 @@ const setCookieAndToken = (user, res) => {
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days expiration
   });
+};
+
+module.exports = {
+  register,
+  verifyEmail,
+  login,
+  verifyToken,
+  logout,
+  loginVerificationCreator,
+  setCookieAndToken,
 };

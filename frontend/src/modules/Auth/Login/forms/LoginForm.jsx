@@ -67,53 +67,71 @@ const LoginForm = () => {
     }
   }
 
-  const handlePasswordForget = useCallback(() => {
-    navigate('/forget-password')
+  const handlePasswordForget = useCallback((location) => {
+    navigate(location)
   }, [])
 
   return (
     <>
       <Toaster position='top-right' />
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
-          {/*Normal Inputs*/}
-          {fields.map((x, idx) => (
-            <FormField
-              key={idx}
-              control={form.control}
-              name={x.name}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder={x.placeholder}
-                      {...field}
-                      type={x.type}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          {/*Normal Inputs*/}
+      <div className='flex flex-col w-full max-w-[500px] m-auto'>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='space-y-2 w-full'
+          >
+            {/*Normal Inputs*/}
+            {fields.map((x, idx) => (
+              <FormField
+                key={idx}
+                control={form.control}
+                name={x.name}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder={x.placeholder}
+                        {...field}
+                        type={x.type}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+            {/*Normal Inputs*/}
 
-          <Button type='submit'>Request Login Link</Button>
-        </form>
-      </Form>
-      {error ? (
-        <p className='text-[16px] font-medium text-red-600 mt-4'>
-          Error: {error}
-        </p>
-      ) : null}
-      <Button
-        variant='destructive'
-        type='submit'
-        className='mt-2'
-        onClick={handlePasswordForget}
-      >
-        Forget Password?
-      </Button>
+            <Button type='submit' className='float-left w-full'>
+              Request Login Link
+            </Button>
+          </form>
+        </Form>
+
+        {error ? (
+          <p className='text-[16px] font-medium text-red-600 mt-4'>
+            Error: {error}
+          </p>
+        ) : null}
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            type='submit'
+            className='float-left mt-2 w-1/2'
+            onClick={() => handlePasswordForget('/signup')}
+          >
+            Sign Up
+          </Button>
+          <Button
+            variant='destructive'
+            type='submit'
+            className='float-left mt-2 w-1/2'
+            onClick={() => handlePasswordForget('/forget-password')}
+          >
+            Forget Password?
+          </Button>
+        </div>
+      </div>
     </>
   )
 }

@@ -9,8 +9,6 @@ const useAuth = () => {
 
   useEffect(() => {
     const token = Cookies.get('token')
-    console.log('cookie', document.cookie)
-    console.log('token', token)
 
     if (token) {
       // Verify the token from backend
@@ -42,7 +40,30 @@ const useAuth = () => {
     }
   }, [])
 
-  return { isLoggedIn, loading, user }
+  const logout = async () => {
+    try {
+      axios
+        .post(
+          'http://localhost:3000/api/auth/logout',
+          {},
+          { withCredentials: true }
+        )
+        .then((response) => {
+          console.log(response.data)
+        })
+        .catch((error) => {
+          console.error('Logout error:', error)
+        })
+
+      // Update auth states
+      setIsLoggedIn(false)
+      setUser(null)
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  return { isLoggedIn, loading, user, logout }
 }
 
 export default useAuth

@@ -9,7 +9,10 @@ import Login from './modules/Auth/Login/screens/Login'
 import ForgetPassword from './modules/Auth/ForgetPassword/screens/ForgetPassword'
 import Layout from './components/layout/Layout'
 import ResetPassword from './modules/Auth/ForgetPassword/screens/ResetPassword'
-
+import Profile from './modules/Profile/screens/Profile'
+import ProtectedRoute from './components/ProtectedRoute'
+import AllUsers from './modules/Profile/screens/AllUsers'
+import EditProfile from './modules/Profile/screens/EditProfile'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -36,6 +39,36 @@ const router = createBrowserRouter([
     element: (
       <Layout>
         <ResetPassword />
+      </Layout>
+    ),
+  },
+  {
+    path: '/profile',
+    element: (
+      <Layout>
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      </Layout>
+    ),
+  },
+  {
+    path: '/profile/users',
+    element: (
+      <Layout>
+        <ProtectedRoute>
+          <AllUsers />
+        </ProtectedRoute>
+      </Layout>
+    ),
+  },
+  {
+    path: '/profile/edit',
+    element: (
+      <Layout>
+        <ProtectedRoute>
+          <EditProfile />
+        </ProtectedRoute>
       </Layout>
     ),
   },

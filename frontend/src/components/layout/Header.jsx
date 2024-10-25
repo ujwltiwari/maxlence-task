@@ -7,7 +7,11 @@ import { GoSignOut } from 'react-icons/go'
 import { Button } from '../ui/button'
 
 const Header = () => {
-  const { user, isLoggedIn } = useAuth()
+  const { user, isLoggedIn, logout } = useAuth()
+  const handleLogout = async () => {
+    console.log('handleLogout')
+    await logout()
+  }
   return (
     <>
       <header className='flex justify-between'>
@@ -33,7 +37,12 @@ const Header = () => {
                 <AvatarImage src={user.image} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-              <Button variant='outline' size='icon' className='rounded-full'>
+              <Button
+                variant='outline'
+                size='icon'
+                className='rounded-full'
+                onClick={handleLogout}
+              >
                 <GoSignOut />
               </Button>
             </>

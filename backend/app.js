@@ -5,23 +5,25 @@ const PORT = 3000;
 const app = express();
 const db = require("./models");
 const authRoutes = require("./routes/(auth)/authRoutes");
+const uploadRoute = require("./routes/upload");
+const userRoute = require("./routes/user");
 connectDB();
 // Middleware to parse JSON
 app.use(express.json());
-app.use(cors());
-// const loginRoute = require("./routes/(auth)/login2");
-// const signUpRoute = require("./routes/(auth)/signup");
-const uploadRoute = require("./routes/upload");
-// const authRoute = require("./routes/(auth)/auth");
+app.use(
+  cors({
+    origin: true, // Allows all domains
+    credentials: true, // Allow cookies to be sent with requests
+  }),
+);
 
 app.get("/", (req, res) => {
   res.send("Basic Route Called");
 });
 
-// app.use("/login", loginRoute);
-// app.use("/signup", signUpRoute);
 app.use("/upload", uploadRoute);
 app.use("/api/auth", authRoutes);
+app.use("/users", userRoute);
 
 db.sequelize
   .sync()
